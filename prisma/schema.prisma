@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PGURL")
+}
+
+model Branch {
+  id              Int     @id @default(autoincrement())
+  name            String  @unique
+  address         String  @unique
+  contact_number  Int     @unique
+}
+
+model Item {
+  id                Int       @id @default(autoincrement())
+  ISBN              Int?      @unique
+  title             String
+  author            String
+  year              Int
+  total_copies      Int
+  available_copies  Int
+  borrowed          Borrowed[]
+}
+
+enum Type {
+  BOOK
+  MOVIE
+}
+
+model Member {
+  id                Int      @id @default(autoincrement())
+  created           DateTime @default(now())
+  name              String
+  address           String
+  contact_number    Int      @unique
+  outstanding_fines Float    @default(0)
+  borrowing         Borrowed[]
+}
+
+model Borrowed {
+  id            Int      @id @default(autoincrement())
+  item_id       Int
+  member_id     Int
+  borrow_date   DateTime
+  return_date   DateTime
+  Item          Item     @relation(fields: [item_id], references: [id])
+  Member        Member   @relation(fields: [member_id], references: [id])
+}
