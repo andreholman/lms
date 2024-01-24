@@ -1,7 +1,8 @@
 require("dotenv").config({path: __dirname + "/.env"})
 
 const express = require("express");
-const pool = require(__dirname + "/config/db.config.js");
+const { PrismaClient } = require("@prisma/client")
+const prisma = new PrismaClient()
 
 const app = express();
 
@@ -16,14 +17,11 @@ app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
-app.get("/branches", (req, res) => {
-	pool.query("SELECT * FROM branches", (error, branches) => {
-		if (error) {
-			throw error;
-		}
-		res.status(200).json(branches.rows);
-	});
+app.get("/branches", async (req, res) => {
+	const branches = await prisma.branch.findMany()
+	res.status(200).json(branches);
 });
+
 
 app.listen(PORT, () => {
 	console.log(`Server listening on the port ${PORT}`);
