@@ -14,12 +14,12 @@ model Branch {
   id              Int     @id @default(autoincrement())
   name            String  @unique
   address         String  @unique
-  contact_number  Int     @unique
+  contact_number  BigInt     @unique
 }
 
 model Item {
   id                Int       @id @default(autoincrement())
-  ISBN              Int?      @unique
+  ISBN              BigInt?      @unique
   title             String
   author            String
   year              Int
@@ -38,7 +38,7 @@ model Member {
   created           DateTime @default(now())
   name              String
   address           String
-  contact_number    Int      @unique
+  contact_number    BigInt      @unique
   outstanding_fines Float    @default(0)
   borrowing         Borrowed[]
 }

@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Branch" ALTER COLUMN "contact_number" SET DATA TYPE BIGINT;
+
+-- AlterTable
+ALTER TABLE "Item" ALTER COLUMN "ISBN" SET DATA TYPE BIGINT;
+
+-- AlterTable
+ALTER TABLE "Member" ALTER COLUMN "contact_number" SET DATA TYPE BIGINT;
