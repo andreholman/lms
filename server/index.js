@@ -10,11 +10,36 @@ const jsonParser = bodyParser.json({type: "*/json"});
 
 const PORT = process.env.PORT || 9000;
 
+BigInt.prototype.toPhoneNumber = function() {
+	const phoneString = this.toString();
+	const areaCode = phoneString.substring(0, 3);
+	const firstPart = phoneString.substring(3, 6);
+	const secondPart = phoneString.substring(6, 10);
+	
+	return `(${areaCode}) ${firstPart}-${secondPart}`;
+}
+function serializeBigInts(objects) { // parses the BigInt in object(s) that contain a contact_number
+	if (Array.isArray(objects)) {
+		return objects.map(
+			(obj) => ({
+				...obj,
+				contact_number: obj.contact_number.toPhoneNumber(),
+			})
+		);
+	} else { // only one to parse
+		return {
+			...objects,
+			contact_number: objects.contact_number.toPhoneNumber(),
+		}
+	}
+}
+
 // middleware
 app.use((req, res, next) => {
 	console.log(`${req.ip} | ${req.method} ${req.url}`);
 	next();
 });
+
 function checkRequestBody(req, res, next) {
 	if (!req.body) {
 		return res.status(400).json({ error: "Request body is missing or empty" });
@@ -29,7 +54,7 @@ app.get("/", (req, res) => {
 app.route("/branches")
 	.get(async (req, res) => { // list branches
 		const branches = await prisma.branch.findMany()
-		res.status(200).json(branches);
+		res.status(200).json(serializeBigInts(branches));
 	})
 	.post(jsonParser, checkRequestBody, async (req, res) => {
 		
@@ -47,7 +72,7 @@ app.route("/branches")
 			},
 		});
 
-		res.status(201).json(newBranch);
+		res.status(201).json(serializeBigInts(newBranch));
 	})
 	.put(jsonParser, checkRequestBody, async (req, res) => {
 		const { id, name, address, contact_number } = req.body;
@@ -60,7 +85,7 @@ app.route("/branches")
 				contact_number
 			},
 		});
-		res.status(200).json(updatedBranch);
+		res.status(200).json(serializeBigInts(updatedBranch));
 	})
 	.delete(jsonParser, checkRequestBody, async (req, res) => {
 		const { id } = req.body;
